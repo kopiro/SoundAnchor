@@ -8,12 +8,30 @@ struct ContentView: View {
     @State private var forceInputEnabled: Bool = AudioManager.shared.isForceInputEnabled
     @State private var hoveredIndex: Int? = nil
     @State private var devicesReloadedAt: Date? = nil
+    @State private var showingHelp = false // Add this state variable
 
     var body: some View {
-        VStack(spacing: 10) {
-            Text("SoundAnchor")
-                .padding(.top)
-                .padding(.bottom, 4)
+        VStack(spacing: 0) {
+            HStack {
+                Text("SoundAnchor")
+                    .bold(true)
+                    
+                Spacer()
+                Button(action: {
+                    showingHelp.toggle()
+                }) {
+                    Image(systemName: "questionmark.circle")
+                        .padding()
+                }
+                .buttonStyle(BorderlessButtonStyle())
+                .popover(isPresented: $showingHelp) {
+                    Text("Reorder the list to set the priority of your audio input devices. The topmost available device will be forced as your system default input device.")
+                        .padding(12)
+                        .frame(width: 300)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.leading, 16)
             
             List {
                 ForEach(devices.indices, id: \.self) { index in
@@ -22,7 +40,7 @@ struct ContentView: View {
                     let isActive = currentDeviceID == device.id
                     let isHovering = hoveredIndex == index
 
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         ZStack {
                             Circle()
                                 .fill(isActive ? Color.blue : Color.gray.opacity(0.3))
@@ -55,7 +73,6 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
-                    .listRowSeparator(.hidden)
                     .opacity(isAvailable ? 1 : 0.5)
                     .background(isHovering ? Color.gray.opacity(0.1) : Color.clear)
                     .cornerRadius(8)
@@ -75,8 +92,13 @@ struct ContentView: View {
                     .onChange(of: forceInputEnabled) { value in
                         AudioManager.shared.isForceInputEnabled = value
                     }
+                Spacer()
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
             }
-            .padding(.bottom)
+            .padding()
+
         }
         .onAppear {
             loadDevices()
@@ -85,7 +107,7 @@ struct ContentView: View {
             }
         }
         .onChange(of: devicesReloadedAt) { _ in
-            loadDevices() // Reload devices when the trigger changes
+            loadDevices()
         }
     }
     

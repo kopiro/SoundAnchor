@@ -1,5 +1,6 @@
 import CoreAudio
 import AppKit
+import UserNotifications
 
 struct AudioDevice {
     let id: AudioDeviceID?
@@ -10,6 +11,7 @@ struct AudioDevice {
 class AudioManager {
     static let shared = AudioManager()
     private let forceInputKey = "ForceInputEnabled"
+    private var lastNotificationDate: Date?
 
     var isForceInputEnabled: Bool {
         get {
@@ -129,14 +131,25 @@ class AudioManager {
 
         let savedDeviceNames = DeviceManager().loadDeviceOrder().map { $0.name }
         let availableDevices = getAudioInputDevices()
+        let currentDeviceID = getCurrentInputDeviceID()
 
         for name in savedDeviceNames {
             if let matchingDevice = availableDevices.first(where: { $0.name == name }) {
+                print("Device \(name) is available")
+                
                 if let deviceID = matchingDevice.id {
-                    print("Set default input device: \(matchingDevice.name)")
-                    setDefaultInputDevice(deviceID: deviceID)
-                    return
+                    if deviceID != currentDeviceID {
+                        print("Set default input device: \(matchingDevice.name)")
+                        setDefaultInputDevice(deviceID: deviceID)
+                    } else {
+                        print("Device \(name) is already the current default input device: \(deviceID)")
+                    }
+                    sendNotification(deviceName: matchingDevice.name)
                 }
+                
+                return
+            } else {
+                print("Device \(name) is not available, continue")
             }
         }
 
@@ -162,6 +175,21 @@ class AudioManager {
         if status != noErr {
             print("Failed to set device with ID: \(deviceID)")
         }
+    }
+
+    private func sendNotification(deviceName: String) {
+        let now = Date()
+        if let lastDate = lastNotificationDate, now.timeIntervalSince(lastDate) < 1 {
+            print("Skipping notification to avoid spamming")
+            return
+        }
+        lastNotificationDate = now
+
+        let content = UNMutableNotificationContent()
+        content.title = "\(deviceName) is active"
+        content.body = "The system default audio input device has been changed to \(deviceName)."
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
 
     func getCurrentInputDeviceID() -> AudioDeviceID? {
@@ -207,8 +235,6 @@ class AudioManager {
 
         if status != noErr {
             print("Failed to register listener for default input device changes")
-        } else {
-            print("Successfully registered listener for default input device changes")
         }
     }
 }

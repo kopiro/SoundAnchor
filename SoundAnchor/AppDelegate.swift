@@ -1,16 +1,20 @@
 import Cocoa
 import SwiftUI
+import ServiceManagement // Import the ServiceManagement framework
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        AudioManager.shared.enforceDeviceOrder()
-        AudioManager.shared.monitorDefaultInputDeviceChanges {
-            AudioManager.shared.enforceDeviceOrder()
-        }
+       addAppToLoginItems()
 
+       AudioManager.shared.monitorDefaultInputDeviceChanges {
+           AudioManager.shared.enforceDeviceOrder()
+       }
+       AudioManager.shared.enforceDeviceOrder()
+        
+        // Create window
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem?.button {
@@ -40,6 +44,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     popoverWindow.setFrame(NSRect(x: xPosition, y: yPosition, width: popoverFrame.width, height: popoverFrame.height), display: true)
                 }
             }
+        }
+    }
+
+    private func addAppToLoginItems() {
+        do {
+            try SMAppService.mainApp.register()
+            print("Successfully added app to login items")
+        } catch {
+            print("Failed to add app to login items: \(error)")
         }
     }
 }
