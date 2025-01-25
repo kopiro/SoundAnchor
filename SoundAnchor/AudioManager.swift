@@ -133,8 +133,8 @@ class AudioManager {
         for name in savedDeviceNames {
             if let matchingDevice = availableDevices.first(where: { $0.name == name }) {
                 if let deviceID = matchingDevice.id {
-                    setDefaultInputDevice(deviceID: deviceID)
                     print("Set default input device: \(matchingDevice.name)")
+                    setDefaultInputDevice(deviceID: deviceID)
                     return
                 }
             }

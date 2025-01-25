@@ -6,6 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AudioManager.shared.enforceDeviceOrder()
         AudioManager.shared.monitorDefaultInputDeviceChanges {
             AudioManager.shared.enforceDeviceOrder()
         }
@@ -13,7 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "1.circle" , accessibilityDescription: nil)
+            button.image = NSImage(systemSymbolName: "mic.fill" , accessibilityDescription: nil)
             button.image?.isTemplate = true // Ensures proper rendering in light/dark mode
             button.action = #selector(togglePopover(_:))
         }
