@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B2A3629D2D44311C00A0486B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A3629C2D44311B00A0486B /* main.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B2A362792D44275700A0486B /* SoundAnchor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundAnchor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2A3629C2D44311B00A0486B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		B2A362702D44275700A0486B = {
 			isa = PBXGroup;
 			children = (
+				B2A3629C2D44311B00A0486B /* main.swift */,
 				B2A3627B2D44275700A0486B /* SoundAnchor */,
 				B2A3627A2D44275700A0486B /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2A3629D2D44311C00A0486B /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,12 +259,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SoundAnchor/Preview Content\"";
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				"INFOPLIST_KEY_NSPrincipalClass[sdk=*]" = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -280,11 +288,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SoundAnchor/Preview Content\"";
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
