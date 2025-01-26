@@ -8,14 +8,16 @@ struct ContentView: View {
     @State private var forceInputEnabled: Bool = AudioManager.shared.isForceInputEnabled
     @State private var hoveredIndex: Int? = nil
     @State private var devicesReloadedAt: Date? = nil
-    @State private var showingHelp = false // Add this state variable
-
+    @State private var showingHelp = false
+    
     var body: some View {
         VStack(spacing: 0) {
+            // App name
             HStack {
                 Text("SoundAnchor")
                     .bold(true)
-                    
+                    .padding()
+                
                 Spacer()
                 Button(action: {
                     showingHelp.toggle()
@@ -25,13 +27,11 @@ struct ContentView: View {
                 }
                 .buttonStyle(BorderlessButtonStyle())
                 .popover(isPresented: $showingHelp) {
-                    Text("Reorder the list to set the priority of your audio input devices. The topmost available device will be forced as your system default input device.")
+                    Text("Reorder the list to set the priority of your audio input devices. The topmost available device will be forced as your system default input device. You can also click on the device to temporarly force it as your system default input device.")
                         .padding(12)
                         .frame(width: 300)
                 }
             }
-            .padding(.vertical, 4)
-            .padding(.leading, 16)
             
             List {
                 ForEach(devices.indices, id: \.self) { index in
@@ -39,26 +39,32 @@ struct ContentView: View {
                     let isAvailable = device.id != nil
                     let isActive = currentDeviceID == device.id
                     let isHovering = hoveredIndex == index
+                    let sampleRate = String(format: "%.0f kHz", Double(device.sampleRate ?? 0) / 1000)
+                    let iconName = getIconName(for: device.name)
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 12) {
                         ZStack {
                             Circle()
                                 .fill(isActive ? Color.blue : Color.gray.opacity(0.3))
-                                .frame(width: 24, height: 24)
-                            
-                            if let icon = device.icon {
-                                Image(nsImage: icon)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 20)
-                            } else {
-                                Image(systemName: "mic.fill") // Fallback icon
-                                    .foregroundColor(isActive ? .white : .primary)
-                                    .frame(width: 20, height: 20)
+                                .frame(width: 28, height: 28)
+                            Image(systemName: iconName)
+                                .foregroundColor(isActive ? .white : .primary)
+                                .frame(width: 20, height: 20)
+                        }
+                        .onTapGesture {
+                            if let deviceID = device.id {
+                                forceInputEnabled = false
+                                AudioManager.shared.setDefaultInputDevice(deviceID: deviceID)
                             }
                         }
                         
-                        Text(device.name)
+                        VStack(alignment: .leading) {
+                            Text(device.name)
+                                .bold(isActive)
+                            Text(isAvailable ? "\(sampleRate)" : "Unavailable")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                        }
                         Spacer()
                         
                         if !isAvailable && isHovering {
@@ -83,12 +89,12 @@ struct ContentView: View {
                 .onMove { indices, newOffset in
                     moveDevices(fromOffsets: indices, toOffset: newOffset)
                 }
-
             }
             .listStyle(PlainListStyle())
+            .padding(.trailing, -16)
 
             HStack {
-                Toggle("Enabled", isOn: $forceInputEnabled)
+                Toggle("Force order", isOn: $forceInputEnabled)
                     .onChange(of: forceInputEnabled) { value in
                         AudioManager.shared.isForceInputEnabled = value
                     }
@@ -102,38 +108,39 @@ struct ContentView: View {
         }
         .onAppear {
             loadDevices()
+            
+            AudioManager.shared.monitorChanges {
+                print("Reloading devices list")
+                devicesReloadedAt = Date()
+            }
             AudioManager.shared.monitorDefaultInputDeviceChanges {
+                print("Reloading default input device")
                 devicesReloadedAt = Date()
             }
         }
         .onChange(of: devicesReloadedAt) { _ in
-            loadDevices()
+            loadDevices() // Reload devices when the trigger changes
         }
     }
     
     private func moveDevices(fromOffsets indices: IndexSet, toOffset newOffset: Int) {
         devices.move(fromOffsets: indices, toOffset: newOffset)
+        DeviceManager().saveDeviceOrder(devices.map { SavedDevice(name: $0.name) })
         
-        let devicesToSave = devices.map { SavedDevice(name: $0.name) }
-        DeviceManager().saveDeviceOrder(devicesToSave)
-
         AudioManager.shared.enforceDeviceOrder()
+        
         currentDeviceID = AudioManager.shared.getCurrentInputDeviceID()
     }
 
     private func loadDevices() {
-        // Load saved device names
-        let savedNames = DeviceManager().loadDeviceOrder().map { $0.name }
-
-        // Get all available devices
+        let savedDevices = DeviceManager().loadDeviceOrder().map { $0.name }
         let availableDevices = AudioManager.shared.getAudioInputDevices()
 
-        // Merge saved and available devices, ensuring proper sorting and gray-out for unavailable devices
-        devices = savedNames.map { name in
+        devices = savedDevices.map { name in
             if let availableDevice = availableDevices.first(where: { $0.name == name }) {
-                return availableDevice // Use the available device
+                return availableDevice
             } else {
-                return AudioDevice(id: nil, name: name, icon: nil) // Create a placeholder for unavailable devices
+                return AudioDevice(name: name, id: nil, sampleRate: nil)
             }
         }
 
@@ -142,7 +149,8 @@ struct ContentView: View {
             devices.append(device)
         }
 
-        // Get the current default input device
+        DeviceManager().saveDeviceOrder(devices.map { SavedDevice(name: $0.name) })
+                
         currentDeviceID = AudioManager.shared.getCurrentInputDeviceID()
     }
 
@@ -150,5 +158,24 @@ struct ContentView: View {
         devices.remove(at: index)
         let devicesToSave = devices.map { SavedDevice(name: $0.name) }
         DeviceManager().saveDeviceOrder(devicesToSave)
+    }
+
+    private func getIconName(for deviceName: String) -> String {
+        switch deviceName.lowercased() {
+        case "macbook pro microphone":
+            return "laptopcomputer"
+        case let name where name.contains("webcam"):
+            return "camera.fill"
+        case let name where name.contains("microphone"):
+            return "mic.fill"
+        case let name where name.contains("line"):
+            return "waveform.path.ecg"
+        case let name where name.contains("soundflower"):
+            return "arrow.up.left.and.arrow.down.right"
+        case let name where name.contains("aggregate"):
+            return "square.stack.3d.up.fill"
+        default:
+            return "mic.fill" // Default icon
+        }
     }
 }

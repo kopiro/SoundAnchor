@@ -3,9 +3,9 @@ import AppKit
 import UserNotifications
 
 struct AudioDevice {
-    let id: AudioDeviceID?
     let name: String
-    let icon: NSImage?
+    let id: AudioDeviceID?
+    let sampleRate: Double?
 }
 
 class AudioManager {
@@ -41,7 +41,9 @@ class AudioManager {
             nil,
             &size
         )
-        guard status == noErr else { return [] }
+        guard status == noErr else {
+            return []
+        }
 
         let deviceCount = Int(size) / MemoryLayout<AudioDeviceID>.size
         var devices = [AudioDeviceID](repeating: 0, count: deviceCount)
@@ -56,10 +58,12 @@ class AudioManager {
 
         // Filter and map input devices
         return devices.compactMap { deviceID in
-            guard isInputDevice(deviceID) else { return nil }
+            guard isInputDevice(deviceID), canBeDefaultDevice(deviceID) else {
+                return nil
+            }
             let name = getDeviceName(deviceID)
-            let icon = getDeviceIcon(deviceID)
-            return AudioDevice(id: deviceID, name: name, icon: icon)
+            let sampleRate = getDeviceSampleRate(deviceID)
+            return AudioDevice(name: name, id: deviceID, sampleRate: sampleRate)
         }
     }
 
@@ -84,6 +88,27 @@ class AudioManager {
         return status == noErr && inputStreams > 0
     }
 
+    private func canBeDefaultDevice(_ deviceID: AudioDeviceID) -> Bool {
+        var size = UInt32(MemoryLayout<UInt32>.size)
+        var canBeDefault: UInt32 = 0
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyDeviceCanBeDefaultDevice,
+            mScope: kAudioDevicePropertyScopeInput,
+            mElement: kAudioObjectPropertyElementMain
+        )
+
+        let status = AudioObjectGetPropertyData(
+            deviceID,
+            &address,
+            0,
+            nil,
+            &size,
+            &canBeDefault
+        )
+
+        return status == noErr && canBeDefault != 0
+    }
+
     func getDeviceName(_ deviceID: AudioDeviceID) -> String {
         var size = UInt32(MemoryLayout<CFString>.size)
         var name: CFString = "" as CFString
@@ -104,11 +129,11 @@ class AudioManager {
         return status == noErr ? (name as String) : "Unknown Device"
     }
     
-    func getDeviceIcon(_ deviceID: AudioDeviceID) -> NSImage? {
-        var size = UInt32(MemoryLayout<CFData>.size)
-        var iconData: CFData?
+    func getDeviceSampleRate(_ deviceID: AudioDeviceID) -> Double {
+        var size = UInt32(MemoryLayout<Double>.size)
+        var sampleRate: Double = 0
         var address = AudioObjectPropertyAddress(
-            mSelector: kAudioDevicePropertyIcon,
+            mSelector: kAudioDevicePropertyNominalSampleRate,
             mScope: kAudioObjectPropertyScopeGlobal,
             mElement: kAudioObjectPropertyElementMain
         )
@@ -119,11 +144,10 @@ class AudioManager {
             0,
             nil,
             &size,
-            &iconData
+            &sampleRate
         )
 
-        guard status == noErr, let iconData = iconData as Data? else { return nil }
-        return NSImage(data: iconData)
+        return status == noErr ? sampleRate : 0
     }
 
     func enforceDeviceOrder() {
@@ -137,14 +161,13 @@ class AudioManager {
             if let matchingDevice = availableDevices.first(where: { $0.name == name }) {
                 print("Device \(name) is available")
                 
-                if let deviceID = matchingDevice.id {
-                    if deviceID != currentDeviceID {
-                        print("Set default input device: \(matchingDevice.name)")
-                        setDefaultInputDevice(deviceID: deviceID)
-                    } else {
-                        print("Device \(name) is already the current default input device: \(deviceID)")
+                if let deviceID = matchingDevice.id, deviceID != currentDeviceID {
+                    print("Set default input device: \(matchingDevice.name)")
+                    if setDefaultInputDevice(deviceID: deviceID) {
+                        sendNotification(deviceName: matchingDevice.name)
                     }
-                    sendNotification(deviceName: matchingDevice.name)
+                } else {
+                    print("Device \(name) is already the current default input device")
                 }
                 
                 return
@@ -156,7 +179,7 @@ class AudioManager {
         print("No devices from the saved order are currently available")
     }
 
-    private func setDefaultInputDevice(deviceID: AudioDeviceID) {
+    public func setDefaultInputDevice(deviceID: AudioDeviceID) -> Bool {
         var address = AudioObjectPropertyAddress(
             mSelector: kAudioHardwarePropertyDefaultInputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
@@ -168,13 +191,14 @@ class AudioManager {
             &address,
             0,
             nil,
-            UInt32(MemoryLayout.size(ofValue: deviceIDCopy)),
+            UInt32(MemoryLayout.size(ofValue: deviceID)),
             &deviceIDCopy
         )
 
         if status != noErr {
             print("Failed to set device with ID: \(deviceID)")
         }
+        return status == noErr
     }
 
     private func sendNotification(deviceName: String) {
@@ -188,6 +212,7 @@ class AudioManager {
         let content = UNMutableNotificationContent()
         content.title = "\(deviceName) is active"
         content.body = "The system default audio input device has been changed to \(deviceName)."
+        
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
@@ -211,6 +236,31 @@ class AudioManager {
         )
 
         return status == noErr ? deviceID : nil
+    }
+    
+    func monitorChanges(callback: @escaping () -> Void) {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+
+        let listenerBlock: AudioObjectPropertyListenerBlock = { _, _ in
+            DispatchQueue.main.async {
+                callback()
+            }
+        }
+
+        let status = AudioObjectAddPropertyListenerBlock(
+            AudioObjectID(kAudioObjectSystemObject),
+            &address,
+            DispatchQueue.main,
+            listenerBlock
+        )
+
+        if status != noErr {
+            print("Failed to register listener for default input device changes")
+        }
     }
     
     func monitorDefaultInputDeviceChanges(callback: @escaping () -> Void) {

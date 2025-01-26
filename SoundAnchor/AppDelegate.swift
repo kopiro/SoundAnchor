@@ -7,13 +7,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-       addAppToLoginItems()
+        enforceDeviceOrder()
 
-       AudioManager.shared.monitorDefaultInputDeviceChanges {
-           AudioManager.shared.enforceDeviceOrder()
-       }
-       AudioManager.shared.enforceDeviceOrder()
-        
+        addAppToLoginItems()
+
         // Create window
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -45,6 +42,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+    
+    private func enforceDeviceOrder() {
+        AudioManager.shared.monitorDefaultInputDeviceChanges {
+           AudioManager.shared.enforceDeviceOrder()
+        }
+        AudioManager.shared.enforceDeviceOrder()
     }
 
     private func addAppToLoginItems() {
