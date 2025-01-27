@@ -91,7 +91,6 @@ struct ContentView: View {
                 }
             }
             .listStyle(PlainListStyle())
-            .padding(.trailing, -16)
 
             HStack {
                 Toggle("Force order", isOn: $forceInputEnabled)

@@ -1,16 +1,13 @@
 import Cocoa
 import SwiftUI
 import ServiceManagement // Import the ServiceManagement framework
+import UserNotifications // Import the UserNotifications framework
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var popover: NSPopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        enforceDeviceOrder()
-
-        addAppToLoginItems()
-
         // Create window
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -24,6 +21,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover = NSPopover()
         popover?.behavior = .transient // Allows auto-dismiss when clicking outside
         popover?.contentViewController = NSHostingController(rootView: ContentView())
+        
+        enforceDeviceOrder()
+
+        addAppToLoginItems()
+
+        requestNotificationPermissions()
     }
 
     @objc func togglePopover(_ sender: AnyObject?) {
@@ -46,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     private func enforceDeviceOrder() {
         AudioManager.shared.monitorDefaultInputDeviceChanges {
-           AudioManager.shared.enforceDeviceOrder()
+            AudioManager.shared.enforceDeviceOrder()
         }
         AudioManager.shared.enforceDeviceOrder()
     }
@@ -57,6 +60,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("Successfully added app to login items")
         } catch {
             print("Failed to add app to login items: \(error)")
+        }
+    }
+
+    private func requestNotificationPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permissions: \(error)")
+            } else if granted {
+                print("Notification permissions granted")
+            } else {
+                print("Notification permissions denied")
+            }
         }
     }
 }
