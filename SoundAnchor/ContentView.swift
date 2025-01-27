@@ -93,7 +93,7 @@ struct ContentView: View {
             .listStyle(PlainListStyle())
 
             HStack {
-                Toggle("Force order", isOn: $forceInputEnabled)
+                Toggle("Enabled", isOn: $forceInputEnabled)
                     .onChange(of: forceInputEnabled) { value in
                         AudioManager.shared.isForceInputEnabled = value
                     }

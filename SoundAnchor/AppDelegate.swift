@@ -12,7 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "mic.fill" , accessibilityDescription: nil)
+            button.image = NSImage(systemSymbolName: "music.mic" , accessibilityDescription: nil)
             button.image?.isTemplate = true // Ensures proper rendering in light/dark mode
             button.action = #selector(togglePopover(_:))
         }
