@@ -2,6 +2,7 @@ import Cocoa
 import SwiftUI
 import ServiceManagement
 import UserNotifications
+import Sentry
 
 #if MAC_APP_STORE
     protocol SPUStandardUserDriverDelegate {}
@@ -16,10 +17,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     var popover: NSPopover?
     
     #if !MAC_APP_STORE
-        var softwareUpdater: SPUUpdater!
+    var softwareUpdater: SPUUpdater!
     #endif
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        setupSentry()
+
         NSApp.setActivationPolicy(.accessory)
         
         // Create window
@@ -36,21 +39,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         popover?.behavior = .transient // Allows auto-dismiss when clicking outside
         popover?.contentViewController = NSHostingController(rootView: ContentView().environmentObject(self))
         
+
         enforceDeviceOrder()
 
         addAppToLoginItems()
 
         requestNotificationPermissions()
         
+        setupUpdater()
+    } 
+
+    func setupUpdater() {
         #if !MAC_APP_STORE
-            let updateDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: self)
-            softwareUpdater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: updateDriver, delegate: self)
-        
-            do {
-                try softwareUpdater.start()
-            } catch {
-                NSLog("Failed to start software updater with error: \(error)")
-            }
+        let updateDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: self)
+        softwareUpdater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: updateDriver, delegate: self)
+    
+        do {
+            try softwareUpdater.start()
+        } catch {
+            NSLog("Failed to start software updater with error: \(error)")
+        }
         #endif
     }
     
@@ -148,5 +156,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     
     @objc public func checkForUpdates() {
         softwareUpdater.checkForUpdates()
+    }
+    
+    func setupSentry() {
+        SentrySDK.start { options in
+            // Read from Info.plist
+            options.dsn = Bundle.main.object(forInfoDictionaryKey: "SentryDSN") as? String
+        }
     }
 }

@@ -77,6 +77,10 @@ struct ContentView: View {
                             }
                             .buttonStyle(BorderlessButtonStyle())
                         }
+                        
+                        // Add index to the right of the row
+                        Text("\(index + 1)")
+                            .foregroundColor(.secondary)
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
