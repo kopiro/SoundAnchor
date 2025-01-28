@@ -1,13 +1,27 @@
 import Cocoa
 import SwiftUI
-import ServiceManagement // Import the ServiceManagement framework
-import UserNotifications // Import the UserNotifications framework
+import ServiceManagement
+import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+#if MAC_APP_STORE
+    protocol SPUStandardUserDriverDelegate {}
+    protocol SPUUpdaterDelegate {}
+#else
+    import Sparkle
+#endif
+
+class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStandardUserDriverDelegate, UNUserNotificationCenterDelegate, ObservableObject {
+    
     var statusItem: NSStatusItem?
     var popover: NSPopover?
-
+    
+    #if !MAC_APP_STORE
+        var softwareUpdater: SPUUpdater!
+    #endif
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.accessory)
+        
         // Create window
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -20,18 +34,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Initialize the popover
         popover = NSPopover()
         popover?.behavior = .transient // Allows auto-dismiss when clicking outside
-        popover?.contentViewController = NSHostingController(rootView: ContentView())
+        popover?.contentViewController = NSHostingController(rootView: ContentView().environmentObject(self))
         
         enforceDeviceOrder()
 
         addAppToLoginItems()
 
         requestNotificationPermissions()
+        
+        #if !MAC_APP_STORE
+            let updateDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: self)
+            softwareUpdater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: updateDriver, delegate: self)
+        
+            do {
+                try softwareUpdater.start()
+            } catch {
+                NSLog("Failed to start software updater with error: \(error)")
+            }
+        #endif
+    }
+    
+    func updater(_ updater: SPUUpdater, willScheduleUpdateCheckAfterDelay delay: TimeInterval) {
+        // We already request notifications permissions on boot
+    }
+    
+    var supportsGentleScheduledUpdateReminders: Bool {
+        return true
     }
 
     @objc func togglePopover(_ sender: AnyObject?) {
         if let button = statusItem?.button, let popover = popover {
-            if popover.isShown {
+            if (popover.isShown) {
                 popover.performClose(sender)
             } else {
                 popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY) // Use .maxY for below the toolbar
@@ -73,5 +106,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("Notification permissions denied")
             }
         }
+    }
+    
+    func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+        NSApp.setActivationPolicy(.regular)
+        
+        if !state.userInitiated {
+            NSApp.dockTile.badgeLabel = "1"
+            
+            // Post a user notification
+            // For banner style notification alerts, this may only trigger when the app is currently inactive.
+            // For alert style notification alerts, this will trigger when the app is active or inactive.
+            do {
+                let content = UNMutableNotificationContent()
+                content.title = "A new update is available"
+                content.body = "Version \(update.displayVersionString) is now available"
+                
+                let request = UNNotificationRequest(identifier: "UpdateCheck", content: content, trigger: nil)
+                
+                UNUserNotificationCenter.current().add(request)
+            }
+        }
+    }
+        
+    func standardUserDriverDidReceiveUserAttention(forUpdate update: SUAppcastItem) {
+        NSApp.dockTile.badgeLabel = ""
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ["UpdateCheck"])
+    }
+    
+    func standardUserDriverWillFinishUpdateSession() {
+        NSApp.setActivationPolicy(.accessory)
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.notification.request.identifier == "UpdateCheck" && response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            softwareUpdater.checkForUpdates()
+        }
+        
+        completionHandler()
+    }
+    
+    @objc public func checkForUpdates() {
+        softwareUpdater.checkForUpdates()
     }
 }

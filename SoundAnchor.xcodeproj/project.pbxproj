@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B2A3629D2D44311C00A0486B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A3629C2D44311B00A0486B /* main.swift */; };
+		B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B2BD78972D48D154005D73A1 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -15,9 +16,22 @@
 		B2A3629C2D44311B00A0486B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B2BD789A2D48D2DD005D73A1 /* Exceptions for "SoundAnchor" folder in "SoundAnchor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B2A362782D44275700A0486B /* SoundAnchor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B2A3627B2D44275700A0486B /* SoundAnchor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B2BD789A2D48D2DD005D73A1 /* Exceptions for "SoundAnchor" folder in "SoundAnchor" target */,
+			);
 			path = SoundAnchor;
 			sourceTree = "<group>";
 		};
@@ -28,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +86,7 @@
 			);
 			name = SoundAnchor;
 			packageProductDependencies = (
+				B2BD78972D48D154005D73A1 /* Sparkle */,
 			);
 			productName = SoundAnchor;
 			productReference = B2A362792D44275700A0486B /* SoundAnchor.app */;
@@ -100,6 +116,9 @@
 			);
 			mainGroup = B2A362702D44275700A0486B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2A3627A2D44275700A0486B /* Products */;
 			projectDirPath = "";
@@ -261,15 +280,16 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SoundAnchor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				"INFOPLIST_KEY_NSPrincipalClass[sdk=*]" = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -277,7 +297,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -297,22 +317,23 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SoundAnchor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -343,6 +364,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B2BD78972D48D154005D73A1 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B2A362712D44275700A0486B /* Project object */;
 }

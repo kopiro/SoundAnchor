@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var hoveredIndex: Int? = nil
     @State private var devicesReloadedAt: Date? = nil
     @State private var showingHelp = false
+    @EnvironmentObject var appDelegate: AppDelegate
     
     var body: some View {
         VStack(spacing: 0) {
@@ -94,16 +95,27 @@ struct ContentView: View {
 
             HStack {
                 Toggle("Enabled", isOn: $forceInputEnabled)
+                    .toggleStyle(SwitchToggleStyle())
                     .onChange(of: forceInputEnabled) { value in
                         AudioManager.shared.isForceInputEnabled = value
                     }
                 Spacer()
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
+
+                Button(action: {
+                    let menu = NSMenu(title: "Settings Menu")
+                    menu.addItem(withTitle: "Check for Updates", action: #selector(appDelegate.checkForUpdates), keyEquivalent: "")
+                    menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
+                    if let contentView = NSApplication.shared.keyWindow?.contentView {
+                        NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
+                    }
+                }) {
+                    Image(systemName: "gearshape")
+                        .resizable()
+                        .frame(width: 16, height: 16)
                 }
+                .buttonStyle(BorderlessButtonStyle())
             }
             .padding()
-
         }
         .onAppear {
             loadDevices()
