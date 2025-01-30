@@ -16,7 +16,7 @@ struct ContentView: View {
             // App name
             HStack {
                 Text("SoundAnchor")
-                    .bold(true)
+                    .fontWeight(.heavy)
                     .padding()
                 
                 Spacer()
@@ -41,8 +41,9 @@ struct ContentView: View {
                     let isActive = currentDeviceID == device.id
                     let isHovering = hoveredIndex == index
                     let sampleRate = String(format: "%.0f kHz", Double(device.sampleRate ?? 0) / 1000)
-                    let iconName = getIconName(for: device.name)
-
+                    let iconName = getIconName(name: device.name, transportType: device.transportType)
+                    let manufacturer = device.manufacturer
+                    
                     HStack(spacing: 12) {
                         ZStack {
                             Circle()
@@ -55,14 +56,15 @@ struct ContentView: View {
                         .onTapGesture {
                             if let deviceID = device.id {
                                 forceInputEnabled = false
-                                AudioManager.shared.setDefaultInputDevice(deviceID: deviceID)
+                                AudioManager.shared.setDefaultInputDevice(deviceID)
                             }
                         }
                         
                         VStack(alignment: .leading) {
                             Text(device.name)
-                                .bold(isActive)
-                            Text(isAvailable ? "\(sampleRate)" : "Unavailable")
+                                .fontWeight(isActive ? .bold : .regular)
+
+                            Text(isAvailable ? "\(sampleRate) - \(manufacturer)" : "Unavailable")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                         }
@@ -98,7 +100,7 @@ struct ContentView: View {
             .listStyle(PlainListStyle())
 
             HStack {
-                Toggle("Enabled", isOn: $forceInputEnabled)
+                Toggle("Enable auto-switch", isOn: $forceInputEnabled)
                     .toggleStyle(SwitchToggleStyle())
                     .onChange(of: forceInputEnabled) { value in
                         AudioManager.shared.isForceInputEnabled = value
@@ -107,7 +109,10 @@ struct ContentView: View {
 
                 Button(action: {
                     let menu = NSMenu(title: "Settings Menu")
+                    #if !APPSTORE
                     menu.addItem(withTitle: "Check for Updates", action: #selector(appDelegate.checkForUpdates), keyEquivalent: "")
+                    #endif
+                    menu.addItem(withTitle: "Buy me an espresso", action: #selector(appDelegate.openDonateLink), keyEquivalent: "")
                     menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
                     if let contentView = NSApplication.shared.keyWindow?.contentView {
                         NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
@@ -155,7 +160,7 @@ struct ContentView: View {
             if let availableDevice = availableDevices.first(where: { $0.name == name }) {
                 return availableDevice
             } else {
-                return AudioDevice(name: name, id: nil, sampleRate: nil)
+                return AudioDevice(name: name, id: nil, sampleRate: nil, manufacturer: "", transportType: nil)
             }
         }
 
@@ -175,22 +180,28 @@ struct ContentView: View {
         DeviceManager().saveDeviceOrder(devicesToSave)
     }
 
-    private func getIconName(for deviceName: String) -> String {
-        switch deviceName.lowercased() {
-        case "macbook pro microphone":
-            return "laptopcomputer"
-        case let name where name.contains("webcam"):
-            return "camera.fill"
-        case let name where name.contains("microphone"):
-            return "mic.fill"
-        case let name where name.contains("line"):
-            return "waveform.path.ecg"
-        case let name where name.contains("soundflower"):
-            return "arrow.up.left.and.arrow.down.right"
-        case let name where name.contains("aggregate"):
-            return "square.stack.3d.up.fill"
-        default:
-            return "mic.fill" // Default icon
+    private func getIconName(name: String, transportType: UInt32?) -> String {
+        switch (transportType) {
+            case kAudioDeviceTransportTypeBuiltIn:
+                return "laptopcomputer"
+            case kAudioDeviceTransportTypeUSB, kAudioDeviceTransportTypeDisplayPort, kAudioDeviceTransportTypeThunderbolt, kAudioDeviceTransportTypeFireWire, kAudioDeviceTransportTypePCI, kAudioDeviceTransportTypeAggregate:
+                return "mic.fill"
+            case kAudioDeviceTransportTypeBluetooth, kAudioDeviceTransportTypeBluetoothLE:
+                return "headphones"
+            case kAudioDeviceTransportTypeHDMI:
+                return "tv"
+            case kAudioDeviceTransportTypeAirPlay:
+                return "airplay.audio"
+            case kAudioDeviceTransportTypeAVB:
+                return "network"
+            case kAudioDeviceTransportTypeVirtual:
+                return "waveform"
+            case kAudioDeviceTransportTypeUnknown:
+                return "mic.fill"
+            case kAudioDeviceTransportTypeContinuityCaptureWired, kAudioDeviceTransportTypeContinuityCaptureWireless:
+                return "iphone"
+            default:
+                return "questiomark"
         }
     }
 }

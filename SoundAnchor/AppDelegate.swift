@@ -4,21 +4,17 @@ import ServiceManagement
 import UserNotifications
 import Sentry
 
-#if MAC_APP_STORE
-    protocol SPUStandardUserDriverDelegate {}
-    protocol SPUUpdaterDelegate {}
+#if !APPSTORE
+import Sparkle
 #else
-    import Sparkle
+protocol SPUStandardUserDriverDelegate {}
+protocol SPUUpdaterDelegate {}
 #endif
 
 class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStandardUserDriverDelegate, UNUserNotificationCenterDelegate, ObservableObject {
     
     var statusItem: NSStatusItem?
     var popover: NSPopover?
-    
-    #if !MAC_APP_STORE
-    var softwareUpdater: SPUUpdater!
-    #endif
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupSentry()
@@ -46,11 +42,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
 
         requestNotificationPermissions()
         
+#if !APPSTORE
         setupUpdater()
-    } 
+#endif
+    }
 
+#if !APPSTORE
+    var softwareUpdater: SPUUpdater!
+    
     func setupUpdater() {
-        #if !MAC_APP_STORE
         let updateDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: self)
         softwareUpdater = SPUUpdater(hostBundle: Bundle.main, applicationBundle: Bundle.main, userDriver: updateDriver, delegate: self)
     
@@ -59,7 +59,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         } catch {
             NSLog("Failed to start software updater with error: \(error)")
         }
-        #endif
     }
     
     func updater(_ updater: SPUUpdater, willScheduleUpdateCheckAfterDelay delay: TimeInterval) {
@@ -68,52 +67,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     
     var supportsGentleScheduledUpdateReminders: Bool {
         return true
-    }
-
-    @objc func togglePopover(_ sender: AnyObject?) {
-        if let button = statusItem?.button, let popover = popover {
-            if (popover.isShown) {
-                popover.performClose(sender)
-            } else {
-                popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY) // Use .maxY for below the toolbar
-                // Center the popover horizontally with the button
-                if let popoverWindow = popover.contentViewController?.view.window {
-                    let buttonFrame = button.window?.frame ?? .zero
-                    let popoverFrame = popoverWindow.frame
-                    let xPosition = buttonFrame.origin.x + (buttonFrame.width / 2) - (popoverFrame.width / 2)
-                    let yPosition = buttonFrame.origin.y - popoverFrame.height - 2
-                    popoverWindow.setFrame(NSRect(x: xPosition, y: yPosition, width: popoverFrame.width, height: popoverFrame.height), display: true)
-                }
-            }
-        }
-    }
-    
-    private func enforceDeviceOrder() {
-        AudioManager.shared.monitorDefaultInputDeviceChanges {
-            AudioManager.shared.enforceDeviceOrder()
-        }
-        AudioManager.shared.enforceDeviceOrder()
-    }
-
-    private func addAppToLoginItems() {
-        do {
-            try SMAppService.mainApp.register()
-            print("Successfully added app to login items")
-        } catch {
-            print("Failed to add app to login items: \(error)")
-        }
-    }
-
-    private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Error requesting notification permissions: \(error)")
-            } else if granted {
-                print("Notification permissions granted")
-            } else {
-                print("Notification permissions denied")
-            }
-        }
     }
     
     func standardUserDriverWillHandleShowingUpdate(_ handleShowingUpdate: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
@@ -156,6 +109,65 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     
     @objc public func checkForUpdates() {
         softwareUpdater.checkForUpdates()
+    }
+    
+#endif
+
+    @objc func togglePopover(_ sender: AnyObject?) {
+        if let button = statusItem?.button, let popover = popover {
+            if (popover.isShown) {
+                popover.performClose(sender)
+            } else {
+                popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY) // Use .maxY for below the toolbar
+                // Center the popover horizontally with the button
+                if let popoverWindow = popover.contentViewController?.view.window {
+                    let buttonFrame = button.window?.frame ?? .zero
+                    let popoverFrame = popoverWindow.frame
+                    let xPosition = buttonFrame.origin.x + (buttonFrame.width / 2) - (popoverFrame.width / 2)
+                    let yPosition = buttonFrame.origin.y - popoverFrame.height - 2
+                    popoverWindow.setFrame(NSRect(x: xPosition, y: yPosition, width: popoverFrame.width, height: popoverFrame.height), display: true)
+                }
+            }
+        }
+    }
+    
+    private func enforceDeviceOrder() {
+        AudioManager.shared.monitorDefaultInputDeviceChanges {
+            AudioManager.shared.enforceDeviceOrder()
+        }
+        AudioManager.shared.enforceDeviceOrder()
+    }
+
+    private func addAppToLoginItems() {
+        do {
+            if #available(macOS 13.0, *) {
+                try SMAppService.mainApp.register()
+            } else {
+                // Fallback on earlier versions
+            }
+            print("Successfully added app to login items")
+        } catch {
+            print("Failed to add app to login items: \(error)")
+        }
+    }
+
+    private func requestNotificationPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permissions: \(error)")
+            } else if granted {
+                print("Notification permissions granted")
+            } else {
+                print("Notification permissions denied")
+            }
+        }
+    }
+    
+    @objc public func openDonateLink() {
+        if let url = Bundle.main.object(forInfoDictionaryKey: "DonateURL") as? String,
+           let espressoURL = URL(string: url) {
+            NSWorkspace.shared.open(espressoURL)
+        }
     }
     
     func setupSentry() {
