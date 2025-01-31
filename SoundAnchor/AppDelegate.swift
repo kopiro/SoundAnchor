@@ -3,6 +3,7 @@ import SwiftUI
 import ServiceManagement
 import UserNotifications
 import Sentry
+import CoreAudio
 
 #if !APPSTORE
 import Sparkle
@@ -29,14 +30,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             button.image?.isTemplate = true // Ensures proper rendering in light/dark mode
             button.action = #selector(togglePopover(_:))
         }
-        
-        // Initialize the popover
-        popover = NSPopover()
-        popover?.behavior = .transient // Allows auto-dismiss when clicking outside
-        popover?.contentViewController = NSHostingController(rootView: ContentView().environmentObject(self))
-        
 
-        enforceDeviceOrder()
+        let contentView = ContentView().environmentObject(self)
+        
+        popover = NSPopover()
+        popover?.behavior = .transient
+        popover?.contentViewController = NSHostingController(rootView: contentView)
+        
+        AudioManager.shared.continuoslyEnforceDeviceOrder()
 
         addAppToLoginItems()
 
@@ -130,13 +131,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             }
         }
     }
-    
-    private func enforceDeviceOrder() {
-        AudioManager.shared.monitorDefaultInputDeviceChanges {
-            AudioManager.shared.enforceDeviceOrder()
-        }
-        AudioManager.shared.enforceDeviceOrder()
-    }
+
 
     private func addAppToLoginItems() {
         do {
