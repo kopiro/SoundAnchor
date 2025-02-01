@@ -10,5 +10,7 @@
 	<string>https://kopiro.s3.amazonaws.com/soundanchor/appcast.xml</string>
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
+	<key>NSApplicationCrashOnExceptions</key>
+	<true/>
 </dict>
 </plist>

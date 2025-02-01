@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		B2A3629D2D44311C00A0486B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A3629C2D44311B00A0486B /* main.swift */; };
 		B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B2BD78972D48D154005D73A1 /* Sparkle */; settings = {ATTRIBUTES = (Weak, ); }; };
-		B2BD78A42D49862C005D73A1 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = B2BD78A32D49862C005D73A1 /* SentrySwiftUI */; settings = {ATTRIBUTES = (Required, ); }; };
+		B2CD5A2A2D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,7 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */,
-				B2BD78A42D49862C005D73A1 /* SentrySwiftUI in Frameworks */,
+				B2CD5A2A2D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +89,7 @@
 			name = SoundAnchor;
 			packageProductDependencies = (
 				B2BD78972D48D154005D73A1 /* Sparkle */,
-				B2BD78A32D49862C005D73A1 /* SentrySwiftUI */,
+				B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */,
 			);
 			productName = SoundAnchor;
 			productReference = B2A362792D44275700A0486B /* SoundAnchor.app */;
@@ -121,7 +121,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */,
-				B2BD78A22D49862C005D73A1 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				B2CD5A282D4D382C004A7DA9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2A3627A2D44275700A0486B /* Products */;
@@ -302,6 +302,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -338,6 +339,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -437,6 +439,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.1.0;
+				OTHER_LDFLAGS = "\"-weak_framework Sparkle -ObjC\"";
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-DAPPSTORE";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -547,6 +550,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 1.1.0;
+				OTHER_LDFLAGS = "\"-weak_framework Sparkle -ObjC\"";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -591,12 +595,12 @@
 				minimumVersion = 2.6.4;
 			};
 		};
-		B2BD78A22D49862C005D73A1 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+		B2CD5A282D4D382C004A7DA9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.43.0;
+				minimumVersion = 11.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -607,10 +611,10 @@
 			package = B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
-		B2BD78A32D49862C005D73A1 /* SentrySwiftUI */ = {
+		B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B2BD78A22D49862C005D73A1 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
-			productName = SentrySwiftUI;
+			package = B2CD5A282D4D382C004A7DA9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsWithoutAdIdSupport;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

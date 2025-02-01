@@ -2,8 +2,8 @@ import Cocoa
 import SwiftUI
 import ServiceManagement
 import UserNotifications
-import Sentry
 import CoreAudio
+import FirebaseCore
 
 #if !APPSTORE
 import Sparkle
@@ -18,7 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     var popover: NSPopover?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        setupSentry()
+        FirebaseApp.configure()
 
         NSApp.setActivationPolicy(.accessory)
         
@@ -164,11 +164,5 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             NSWorkspace.shared.open(espressoURL)
         }
     }
-    
-    func setupSentry() {
-        SentrySDK.start { options in
-            // Read from Info.plist
-            options.dsn = Bundle.main.object(forInfoDictionaryKey: "SentryDSN") as? String
-        }
-    }
+
 }
