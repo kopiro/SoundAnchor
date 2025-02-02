@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreAudio
+import FirebaseAnalytics
 
 struct ContentView: View {
     @State private var inputDevices: [AudioDevice] = []
@@ -12,9 +13,7 @@ struct ContentView: View {
     @State private var showingHelp = false
 
     @EnvironmentObject var appDelegate: AppDelegate
-    
-    var requestSizeUpdate: (() -> Void)?
-    
+        
     var body: some View {
         VStack {
             TopBarView(showingHelp: $showingHelp)
@@ -23,11 +22,15 @@ struct ContentView: View {
                     title: "Input Devices",
                     devices: inputDevices,
                     isForceEnabled: $forceInputEnabled,
-                    headerToggleAction: { AudioManager.shared.isForceInputEnabled = $0 },
+                    headerToggleAction: { value in
+                        AudioManager.shared.isForceInputEnabled = value
+                        Analytics.logEvent("toggle_force_input", parameters: ["enabled": value])
+                    },
                     moveAction: moveInputDevices,
                     onTap: { deviceID in
                         forceInputEnabled = false
                         AudioManager.shared.setDefaultDevice(deviceID: deviceID, selector: kAudioHardwarePropertyDefaultInputDevice)
+                        Analytics.logEvent("set_default_input_device", parameters: ["device_id": deviceID])
                     },
                     isActive: { deviceID in currentInputDeviceID == deviceID },
                     deleteAction: deleteInputDevice
@@ -36,11 +39,15 @@ struct ContentView: View {
                     title: "Output Devices",
                     devices: outputDevices,
                     isForceEnabled: $forceOutputEnabled,
-                    headerToggleAction: { AudioManager.shared.isForceOutputEnabled = $0 },
+                    headerToggleAction: { value in
+                        AudioManager.shared.isForceOutputEnabled = value
+                        Analytics.logEvent("toggle_force_output", parameters: ["enabled": value])
+                    },
                     moveAction: moveOutputDevices,
                     onTap: { deviceID in
                         forceOutputEnabled = false
                         AudioManager.shared.setDefaultDevice(deviceID: deviceID, selector: kAudioHardwarePropertyDefaultOutputDevice)
+                        Analytics.logEvent("set_default_output_device", parameters: ["device_id": deviceID])
                     },
                     isActive: { deviceID in currentOutputDeviceID == deviceID },
                     deleteAction: deleteOutputDevice
@@ -54,6 +61,7 @@ struct ContentView: View {
             AudioManager.shared.monitorAnyDevicesChanges { devicesReloadedAt = Date() }
             AudioManager.shared.monitorDefaultDeviceChanges(selector: kAudioHardwarePropertyDefaultOutputDevice) { devicesReloadedAt = Date() }
             AudioManager.shared.monitorDefaultDeviceChanges(selector: kAudioHardwarePropertyDefaultInputDevice) { devicesReloadedAt = Date() }
+            Analytics.logEvent("app_opened", parameters: nil)
         }
         .frame(minWidth: 300, minHeight: 400)
         .onChange(of: devicesReloadedAt) { _ in loadDevices() }
@@ -64,6 +72,7 @@ struct ContentView: View {
         DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
         AudioManager.shared.enforceInputDeviceOrder()
         currentInputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultInputDevice)
+        Analytics.logEvent("move_input_devices", parameters: nil)
     }
 
     private func moveOutputDevices(fromOffsets indices: IndexSet, toOffset newOffset: Int) {
@@ -71,6 +80,7 @@ struct ContentView: View {
         DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
         AudioManager.shared.enforceOutputDeviceOrder()
         currentOutputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultOutputDevice)
+        Analytics.logEvent("move_output_devices", parameters: nil)
     }
 
     private func loadDevices() {
@@ -88,9 +98,7 @@ struct ContentView: View {
         
         DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
         DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
-        
-        requestSizeUpdate?()
-    }
+            }
 
     private func mergeDevices(savedNames: [String], available: [AudioDevice], ioType: String) -> [AudioDevice] {
         var result = savedNames.map { name in
@@ -107,12 +115,14 @@ struct ContentView: View {
         guard let index = inputDevices.firstIndex(where: { $0.uniqueIdentifier == device.uniqueIdentifier }) else { return }
         inputDevices.remove(at: index)
         DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
+        Analytics.logEvent("delete_input_device", parameters: ["device_name": device.name])
     }
 
     private func deleteOutputDevice(_ device: AudioDevice) {
         guard let index = outputDevices.firstIndex(where: { $0.uniqueIdentifier == device.uniqueIdentifier }) else { return }
         outputDevices.remove(at: index)
         DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
+        Analytics.logEvent("delete_output_device", parameters: ["device_name": device.name])
     }
 }
 
@@ -132,20 +142,13 @@ struct TopBarView: View {
             .frame(width: 24, height: 24)
             .buttonStyle(BorderlessButtonStyle())
             .popover(isPresented: $showingHelp) {
-                Text("Reorder the list to set the priority of your devices, then enable \"Auto-switch\" to let SoundAnchor do the rest for you. The topmost available device will be forced automatically.")
+                Text("Reorder the list to set the priority of your devices, then enable \"Enable auto-switch\" to let SoundAnchor do the rest for you. The topmost available device will be forced automatically.")
                     .padding(12)
                     .frame(width: 300)
             }
             Button(action: {
-                let menu = NSMenu(title: "Settings Menu")
-                #if !APPSTORE
-                menu.addItem(withTitle: "Check for Updates", action: #selector(appDelegate.checkForUpdates), keyEquivalent: "")
-                #endif
-                menu.addItem(withTitle: "Buy me an espresso", action: #selector(appDelegate.openDonateLink), keyEquivalent: "")
-                menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
-                if let contentView = NSApplication.shared.keyWindow?.contentView {
-                    NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
-                }
+                appDelegate.showSettingsMenu()
+                Analytics.logEvent("settings_menu_opened", parameters: nil)
             }) {
                 Image(systemName: "gearshape")
                     .resizable()
@@ -191,7 +194,7 @@ struct DeviceListSection: View {
         HStack {
             Text(title)
             Spacer()
-            Toggle("Auto-switch", isOn: $isForceEnabled)
+            Toggle("Enable auto-switch", isOn: $isForceEnabled)
                 .onChange(of: isForceEnabled, perform: headerToggleAction)
         }
     }

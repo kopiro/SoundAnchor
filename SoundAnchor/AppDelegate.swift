@@ -4,6 +4,7 @@ import ServiceManagement
 import UserNotifications
 import CoreAudio
 import FirebaseCore
+import FirebaseAnalytics
 
 #if !APPSTORE
 import Sparkle
@@ -110,6 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     
     @objc public func checkForUpdates() {
         softwareUpdater.checkForUpdates()
+        Analytics.logEvent("check_for_updates", parameters: nil)
     }
     
 #endif
@@ -118,6 +120,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         if let button = statusItem?.button, let popover = popover {
             if (popover.isShown) {
                 popover.performClose(sender)
+                Analytics.logEvent("popover_closed", parameters: nil)
             } else {
                 popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY) // Use .maxY for below the toolbar
                 // Center the popover horizontally with the button
@@ -128,21 +131,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
                     let yPosition = buttonFrame.origin.y - popoverFrame.height - 2
                     popoverWindow.setFrame(NSRect(x: xPosition, y: yPosition, width: popoverFrame.width, height: popoverFrame.height), display: true)
                 }
+                Analytics.logEvent("popover_opened", parameters: nil)
             }
         }
     }
-
 
     private func addAppToLoginItems() {
         do {
             if #available(macOS 13.0, *) {
                 try SMAppService.mainApp.register()
+                Analytics.logEvent("add_to_login_items_success", parameters: nil)
             } else {
                 // Fallback on earlier versions
             }
             print("Successfully added app to login items")
         } catch {
             print("Failed to add app to login items: \(error)")
+            Analytics.logEvent("add_to_login_items_failure", parameters: ["error": error.localizedDescription])
         }
     }
 
@@ -150,10 +155,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
                 print("Error requesting notification permissions: \(error)")
+                Analytics.logEvent("notification_permission_error", parameters: ["error": error.localizedDescription])
             } else if granted {
                 print("Notification permissions granted")
+                Analytics.logEvent("notification_permission_granted", parameters: nil)
             } else {
                 print("Notification permissions denied")
+                Analytics.logEvent("notification_permission_denied", parameters: nil)
             }
         }
     }
@@ -162,7 +170,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         if let url = Bundle.main.object(forInfoDictionaryKey: "DonateURL") as? String,
            let espressoURL = URL(string: url) {
             NSWorkspace.shared.open(espressoURL)
+            Analytics.logEvent("open_donate_link", parameters: nil)
         }
     }
-
+    
+    @objc func showSettingsMenu() {
+        let menu = NSMenu(title: "Settings Menu")
+        #if !APPSTORE
+        menu.addItem(withTitle: "Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
+        #endif
+        menu.addItem(withTitle: "Buy me an espresso", action: #selector(openDonateLink), keyEquivalent: "")
+        menu.addItem(withTitle: "Get support", action: #selector(contactDeveloper), keyEquivalent: "")
+        menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
+        if let contentView = NSApplication.shared.keyWindow?.contentView {
+            NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
+        }
+        Analytics.logEvent("show_settings_menu", parameters: nil)
+    }
+    
+    @objc func contactDeveloper() {
+        if let email = Bundle.main.object(forInfoDictionaryKey: "DeveloperEmail") as? String,
+           let mailURL = URL(string: "mailto:\(email)") {
+            NSWorkspace.shared.open(mailURL)
+            Analytics.logEvent("contact_developer", parameters: nil)
+        }
+    }
 }
