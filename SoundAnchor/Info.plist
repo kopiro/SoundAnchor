@@ -6,11 +6,11 @@
 	<string>destefano.flavio+soundanchor@gmail.com</string>
 	<key>DonateURL</key>
 	<string>https://buymeacoffee.com/kopiro</string>
-	<key>SUFeedURL</key>
-	<string>https://kopiro.s3.amazonaws.com/soundanchor/appcast.xml</string>
-	<key>SUEnableInstallerLauncherService</key>
-	<true/>
 	<key>NSApplicationCrashOnExceptions</key>
 	<true/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://apps.kopiro.me/soundanchor/appcast.xml</string>
 </dict>
 </plist>
