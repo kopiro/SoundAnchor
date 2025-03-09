@@ -98,7 +98,7 @@ struct ContentView: View {
         
         DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
         DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
-            }
+    }
 
     private func mergeDevices(savedNames: [String], available: [AudioDevice], ioType: String) -> [AudioDevice] {
         var result = savedNames.map { name in
@@ -238,8 +238,15 @@ struct DeviceRowView: View {
                 .buttonStyle(BorderlessButtonStyle())
             }
             
-            Text("\(index + 1)")
+            Image(systemName: "line.3.horizontal")
                 .foregroundColor(.secondary)
+                .onHover { hovering in
+                    if hovering {
+                        NSCursor.openHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)

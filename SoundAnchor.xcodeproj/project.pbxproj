@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B2925F372D74681B00FAC403 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */; };
+		B29F1C1C2D745D4800A27F65 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B29F1C1B2D745D4800A27F65 /* FirebaseCrashlytics */; };
+		B29F1C1E2D745D4F00A27F65 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B29F1C1D2D745D4F00A27F65 /* FirebaseAnalytics */; };
 		B2A3629D2D44311C00A0486B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A3629C2D44311B00A0486B /* main.swift */; };
 		B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = B2BD78972D48D154005D73A1 /* Sparkle */; settings = {ATTRIBUTES = (Weak, ); }; };
-		B2CD5A2A2D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,19 +45,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2925F372D74681B00FAC403 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				B2BD78982D48D154005D73A1 /* Sparkle in Frameworks */,
-				B2CD5A2A2D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				B29F1C1C2D745D4800A27F65 /* FirebaseCrashlytics in Frameworks */,
+				B29F1C1E2D745D4F00A27F65 /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B29F1C1A2D745D3800A27F65 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B2A362702D44275700A0486B = {
 			isa = PBXGroup;
 			children = (
 				B2A3629C2D44311B00A0486B /* main.swift */,
 				B2A3627B2D44275700A0486B /* SoundAnchor */,
+				B29F1C1A2D745D3800A27F65 /* Frameworks */,
 				B2A3627A2D44275700A0486B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +102,8 @@
 			packageProductDependencies = (
 				B2BD78972D48D154005D73A1 /* Sparkle */,
 				B2CD5A292D4D382C004A7DA9 /* FirebaseAnalyticsWithoutAdIdSupport */,
+				B29F1C1B2D745D4800A27F65 /* FirebaseCrashlytics */,
+				B29F1C1D2D745D4F00A27F65 /* FirebaseAnalytics */,
 			);
 			productName = SoundAnchor;
 			productReference = B2A362792D44275700A0486B /* SoundAnchor.app */;
@@ -284,7 +298,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -293,7 +307,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano <destefano.flavio@gmail.com>";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				"INFOPLIST_KEY_NSPrincipalClass[sdk=*]" = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -322,7 +336,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -331,14 +345,14 @@
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano <destefano.flavio@gmail.com>";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.1.2;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -422,7 +436,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -431,23 +445,24 @@
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano <destefano.flavio@gmail.com>";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.1.2;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-weak_framework",
 					Sparkle,
 				);
-				"OTHER_SWIFT_FLAGS[arch=*]" = "-DAPPSTORE";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = APPSTORE;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -536,7 +551,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = B8R4H99K58;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -545,7 +560,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = SoundAnchor;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "2025 Flavio De Stefano";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Flavio De Stefano <destefano.flavio@gmail.com>";
 				INFOPLIST_KEY_NSPrincipalClass = "";
 				"INFOPLIST_KEY_NSPrincipalClass[sdk=*]" = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -553,15 +568,17 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.1.2;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-weak_framework",
 					Sparkle,
 				);
+				"OTHER_SWIFT_FLAGS[arch=*]" = "";
 				PRODUCT_BUNDLE_IDENTIFIER = me.kopiro.soundanchor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APPSTORE $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -614,6 +631,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B29F1C1B2D745D4800A27F65 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2CD5A282D4D382C004A7DA9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		B29F1C1D2D745D4F00A27F65 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2CD5A282D4D382C004A7DA9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
 		B2BD78972D48D154005D73A1 /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B2BD78962D48D154005D73A1 /* XCRemoteSwiftPackageReference "Sparkle" */;

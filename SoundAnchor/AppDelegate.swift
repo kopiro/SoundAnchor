@@ -18,7 +18,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     var statusItem: NSStatusItem?
     var popover: NSPopover?
     
+    var isFirstLaunch: Bool = !UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
+        UserDefaults.standard.register(
+            defaults: ["NSApplicationCrashOnExceptions" : true]
+        )
+        
+        UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+        
         FirebaseApp.configure()
 
         NSApp.setActivationPolicy(.accessory)
@@ -47,6 +55,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
 #if !APPSTORE
         setupUpdater()
 #endif
+
+        if isFirstLaunch {
+            print("Launching app first time")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.togglePopover(nil)
+            }
+        }
     }
 
 #if !APPSTORE
@@ -77,9 +92,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         if !state.userInitiated {
             NSApp.dockTile.badgeLabel = "1"
             
-            // Post a user notification
-            // For banner style notification alerts, this may only trigger when the app is currently inactive.
-            // For alert style notification alerts, this will trigger when the app is active or inactive.
             do {
                 let content = UNMutableNotificationContent()
                 content.title = "A new update is available"
@@ -178,9 +190,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         let menu = NSMenu(title: "Settings Menu")
         #if !APPSTORE
         menu.addItem(withTitle: "Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
-        #endif
         menu.addItem(withTitle: "Buy me an espresso", action: #selector(openDonateLink), keyEquivalent: "")
-        menu.addItem(withTitle: "Get support", action: #selector(contactDeveloper), keyEquivalent: "")
+        #endif
+        menu.addItem(withTitle: "Get support", action: #selector(getSupport), keyEquivalent: "")
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
         if let contentView = NSApplication.shared.keyWindow?.contentView {
             NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
@@ -188,11 +200,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         Analytics.logEvent("show_settings_menu", parameters: nil)
     }
     
-    @objc func contactDeveloper() {
+    @objc func getSupport() {
         if let email = Bundle.main.object(forInfoDictionaryKey: "DeveloperEmail") as? String,
            let mailURL = URL(string: "mailto:\(email)") {
             NSWorkspace.shared.open(mailURL)
             Analytics.logEvent("contact_developer", parameters: nil)
         }
     }
+    
+   
 }
