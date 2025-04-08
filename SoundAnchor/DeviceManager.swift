@@ -9,6 +9,7 @@ import Foundation
 
 struct SavedDevice: Codable, Hashable {
     let name: String
+    let uid: String
 }
 
 class DeviceManager {

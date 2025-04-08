@@ -7,8 +7,8 @@ struct AudioDevice {
     let ioType: String
     let id: AudioDeviceID?
     let transportType: UInt32?
-    
-    var uniqueIdentifier: String { "\(ioType):\(name)" }
+    let manufacturer: String
+    let uid: String
 }
 
 class AudioManager {
@@ -62,28 +62,35 @@ class AudioManager {
         }
 
         let deviceCount = Int(size) / MemoryLayout<AudioDeviceID>.size
-        var devices = [AudioDeviceID](repeating: 0, count: deviceCount)
+        var devicesIds = [AudioDeviceID](repeating: 0, count: deviceCount)
         AudioObjectGetPropertyData(
             AudioObjectID(kAudioObjectSystemObject),
             &address,
             0,
             nil,
             &size,
-            &devices
+            &devicesIds
         )
         
-        print("Audio Device IDs: ", devices)
-
         // Filter and map output devices
-        return devices.compactMap { deviceID in
+        return devicesIds.compactMap { deviceID in
             let name = getDeviceName(deviceID)
+            let manufacturer = getDeviceManufacturer(deviceID)
+            let uid = getDeviceUID(deviceID)
     
             guard canBeDefaultDevice(deviceID: deviceID, scope: scope) else {
                 return nil
             }
 
             let transportType = getDeviceTransportType(deviceID)
-            return AudioDevice(name: name, ioType: "output", id: deviceID, transportType: transportType)
+            return AudioDevice(
+                name: name,
+                ioType: scope == kAudioDevicePropertyScopeInput ? "input" : "output",
+                id: deviceID,
+                transportType: transportType,
+                manufacturer: manufacturer,
+                uid: uid
+            )
         }
     }
 
@@ -205,17 +212,46 @@ class AudioManager {
         return transportType
     }
 
+    func getDeviceUID(_ deviceID: AudioDeviceID) -> String {
+        var size = UInt32(MemoryLayout<CFString>.size)
+        var uid: Unmanaged<CFString>?
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyDeviceUID,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+
+        let status = AudioObjectGetPropertyData(
+            deviceID,
+            &address,
+            0,
+            nil,
+            &size,
+            &uid
+        )
+
+        if status == noErr, let deviceUID = uid?.takeRetainedValue() as String? {
+            return deviceUID
+        } else {
+            print("Failed to get device UID for device ID: \(deviceID)")
+            // If we can't get the UID, fall back to a combination of other properties
+            let manufacturer = getDeviceManufacturer(deviceID)
+            let transportType = getDeviceTransportType(deviceID) ?? 0
+            return "\(manufacturer):\(transportType):\(deviceID)"
+        }
+    }
+
     func enforceInputDeviceOrder() {
         guard isForceInputEnabled else { return }
 
-        let savedDeviceNames = DeviceManager().loadInputDeviceOrder().map { $0.name }
+        let savedDevices = DeviceManager().loadInputDeviceOrder()
         let availableDevices = getAudioDevices(scope: kAudioDevicePropertyScopeInput)
         let currentDeviceID = getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultInputDevice)
         let currentDeviceName = currentDeviceID.flatMap { getDeviceName($0) }
 
-        for name in savedDeviceNames {
-            if let matchingDevice = availableDevices.first(where: { $0.name == name }) {
-                print("Device \(name) is available")
+        for savedDevice in savedDevices {
+            if let matchingDevice = availableDevices.first(where: { $0.uid == savedDevice.uid }) {
+                print("Device \(savedDevice.name) is available")
                 
                 if let deviceID = matchingDevice.id, deviceID != currentDeviceID {
                     print("Forcing default input device to: \(matchingDevice.name)")
@@ -224,12 +260,12 @@ class AudioManager {
                         sendNotification(ioType: "input", currentDeviceName: currentDeviceName, deviceName: matchingDevice.name)
                     }
                 } else {
-                    print("Device \(name) is already the current default input device")
+                    print("Device \(savedDevice.name) is already the current default input device")
                 }
                 
                 return
             } else {
-                print("Device \(name) is not available, continue")
+                print("Device \(savedDevice.name) is not available, continue")
             }
         }
 
@@ -239,14 +275,14 @@ class AudioManager {
     func enforceOutputDeviceOrder() {
         guard isForceOutputEnabled else { return }
 
-        let savedDeviceNames = DeviceManager().loadOutputDeviceOrder().map { $0.name }
+        let savedDevices = DeviceManager().loadOutputDeviceOrder()
         let availableDevices = getAudioDevices(scope: kAudioDevicePropertyScopeOutput)
         let currentDeviceID = getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultOutputDevice)
         let currentDeviceName = currentDeviceID.flatMap { getDeviceName($0) }
 
-        for name in savedDeviceNames {
-            if let matchingDevice = availableDevices.first(where: { $0.name == name }) {
-                print("Device \(name) is available")
+        for savedDevice in savedDevices {
+            if let matchingDevice = availableDevices.first(where: { $0.uid == savedDevice.uid }) {
+                print("Device \(savedDevice.name) is available")
                 
                 if let deviceID = matchingDevice.id, deviceID != currentDeviceID {
                     print("Forcing default output device to: \(matchingDevice.name)")
@@ -255,12 +291,12 @@ class AudioManager {
                         sendNotification(ioType: "output", currentDeviceName: currentDeviceName, deviceName: matchingDevice.name)
                     }
                 } else {
-                    print("Device \(name) is already the current default output device")
+                    print("Device \(savedDevice.name) is already the current default output device")
                 }
                 
                 return
             } else {
-                print("Device \(name) is not available, continue")
+                print("Device \(savedDevice.name) is not available, continue")
             }
         }
 

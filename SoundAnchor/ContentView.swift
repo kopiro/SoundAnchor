@@ -69,7 +69,7 @@ struct ContentView: View {
     
     private func moveInputDevices(fromOffsets indices: IndexSet, toOffset newOffset: Int) {
         inputDevices.move(fromOffsets: indices, toOffset: newOffset)
-        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
+        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
         AudioManager.shared.enforceInputDeviceOrder()
         currentInputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultInputDevice)
         Analytics.logEvent("move_input_devices", parameters: nil)
@@ -77,7 +77,7 @@ struct ContentView: View {
 
     private func moveOutputDevices(fromOffsets indices: IndexSet, toOffset newOffset: Int) {
         outputDevices.move(fromOffsets: indices, toOffset: newOffset)
-        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
+        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
         AudioManager.shared.enforceOutputDeviceOrder()
         currentOutputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultOutputDevice)
         Analytics.logEvent("move_output_devices", parameters: nil)
@@ -87,41 +87,48 @@ struct ContentView: View {
         currentInputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultInputDevice)
         currentOutputDeviceID = AudioManager.shared.getCurrentDeviceID(selector: kAudioHardwarePropertyDefaultOutputDevice)
         
-        let savedInputDevices = DeviceManager().loadInputDeviceOrder().map { $0.name }
-        let savedOutputDevices = DeviceManager().loadOutputDeviceOrder().map { $0.name }
+        let savedInputDevices = DeviceManager().loadInputDeviceOrder()
+        let savedOutputDevices = DeviceManager().loadOutputDeviceOrder()
         
         let availableInputDevices = AudioManager.shared.getAudioDevices(scope: kAudioDevicePropertyScopeInput)
         let availableOutputDevices = AudioManager.shared.getAudioDevices(scope: kAudioDevicePropertyScopeOutput)
 
-        inputDevices = mergeDevices(savedNames: savedInputDevices, available: availableInputDevices, ioType: "input")
-        outputDevices = mergeDevices(savedNames: savedOutputDevices, available: availableOutputDevices, ioType: "output")
+        inputDevices = mergeDevices(savedDevices: savedInputDevices, available: availableInputDevices, ioType: "input")
+        outputDevices = mergeDevices(savedDevices: savedOutputDevices, available: availableOutputDevices, ioType: "output")
         
-        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
-        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
+        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
+        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
     }
 
-    private func mergeDevices(savedNames: [String], available: [AudioDevice], ioType: String) -> [AudioDevice] {
-        var result = savedNames.map { name in
-            available.first(where: { $0.name == name })
-            ?? AudioDevice(name: name, ioType: ioType, id: nil, transportType: nil)
+    private func mergeDevices(savedDevices: [SavedDevice], available: [AudioDevice], ioType: String) -> [AudioDevice] {
+        var result = savedDevices.map { savedDevice in
+            available.first(where: { $0.uid == savedDevice.uid })
+            ?? AudioDevice(
+                name: savedDevice.name,
+                ioType: ioType,
+                id: nil,
+                transportType: nil,
+                manufacturer: "-",
+                uid: savedDevice.uid
+            )
         }
-        for device in available where !result.contains(where: { $0.name == device.name }) {
+        for device in available where !result.contains(where: { $0.uid == device.uid }) {
             result.append(device)
         }
         return result
     }
     
     private func deleteInputDevice(_ device: AudioDevice) {
-        guard let index = inputDevices.firstIndex(where: { $0.uniqueIdentifier == device.uniqueIdentifier }) else { return }
+        guard let index = inputDevices.firstIndex(where: { $0.uid == device.uid }) else { return }
         inputDevices.remove(at: index)
-        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name) })
+        DeviceManager().saveInputDeviceOrder(inputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
         Analytics.logEvent("delete_input_device", parameters: ["device_name": device.name])
     }
 
     private func deleteOutputDevice(_ device: AudioDevice) {
-        guard let index = outputDevices.firstIndex(where: { $0.uniqueIdentifier == device.uniqueIdentifier }) else { return }
+        guard let index = outputDevices.firstIndex(where: { $0.uid == device.uid }) else { return }
         outputDevices.remove(at: index)
-        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name) })
+        DeviceManager().saveOutputDeviceOrder(outputDevices.map { SavedDevice(name: $0.name, uid: $0.uid) })
         Analytics.logEvent("delete_output_device", parameters: ["device_name": device.name])
     }
 }
@@ -174,7 +181,7 @@ struct DeviceListSection: View {
     
     var body: some View {
         Section(header: headerView) {
-            ForEach(Array(devices.enumerated()), id: \.element.uniqueIdentifier) { (index, device) in
+            ForEach(Array(devices.enumerated()), id: \.element.uid) { (index, device) in
                 DeviceRowView(
                     device: device,
                     index: index,
