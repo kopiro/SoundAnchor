@@ -48,7 +48,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         
         AudioManager.shared.continuoslyEnforceDeviceOrder()
 
-        addAppToLoginItems()
+        if isFirstLaunch && !isAppInLoginItems() {
+            askToAddToLoginItems()
+        }
 
         requestNotificationPermissions()
         
@@ -61,6 +63,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.togglePopover(nil)
             }
+        }
+    }
+
+    private func askToAddToLoginItems() {
+        let alert = NSAlert()
+        alert.messageText = "Add to Login Items?"
+        alert.informativeText = "Would you like SoundAnchor to start automatically when you log in? This will help ensure your audio devices are always managed correctly."
+        alert.addButton(withTitle: "Yes")
+        alert.addButton(withTitle: "No")
+        alert.alertStyle = .informational
+        
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            addAppToLoginItems()
         }
     }
 
@@ -186,12 +202,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         }
     }
     
+    private func isAppInLoginItems() -> Bool {
+        if #available(macOS 13.0, *) {
+            return SMAppService.mainApp.status == .enabled
+        }
+        return false
+    }
+    
+    private func removeFromLoginItems() {
+        do {
+            if #available(macOS 13.0, *) {
+                try SMAppService.mainApp.unregister()
+                Analytics.logEvent("remove_from_login_items_success", parameters: nil)
+            }
+        } catch {
+            print("Failed to remove app from login items: \(error)")
+            Analytics.logEvent("remove_from_login_items_failure", parameters: ["error": error.localizedDescription])
+        }
+    }
+
+    @objc private func toggleLoginItems() {
+        if isAppInLoginItems() {
+            removeFromLoginItems()
+        } else {
+            addAppToLoginItems()
+        }
+    }
+
     @objc func showSettingsMenu() {
         let menu = NSMenu(title: "Settings Menu")
         #if !APPSTORE
         menu.addItem(withTitle: "Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
         menu.addItem(withTitle: "Buy me an espresso", action: #selector(openDonateLink), keyEquivalent: "")
         #endif
+        menu.addItem(withTitle: isAppInLoginItems() ? "Remove from Login Items" : "Add to Login Items", 
+                    action: #selector(toggleLoginItems), 
+                    keyEquivalent: "")
         menu.addItem(withTitle: "Get support", action: #selector(getSupport), keyEquivalent: "")
         menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
         if let contentView = NSApplication.shared.keyWindow?.contentView {
@@ -207,6 +253,5 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             Analytics.logEvent("contact_developer", parameters: nil)
         }
     }
-    
-   
+
 }
