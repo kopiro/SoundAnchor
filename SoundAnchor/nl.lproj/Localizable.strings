@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "Steun SoundAnchor";
+"donation_message" = "Als u SoundAnchor nuttig vindt, overweeg dan een donatie om de ontwikkeling en het onderhoud te ondersteunen.";
+"donation_cancel" = "Annuleren";
+"donation_donate" = "Nu doneren";
+
+// Donation Reminder
+"reminder_title" = "Geniet u van SoundAnchor?";
+"reminder_message" = "Als u SoundAnchor nuttig vindt, overweeg dan een donatie om de ontwikkeling te ondersteunen. Uw steun helpt de app gratis te houden en continu te verbeteren.";
+"reminder_later" = "Misschien later";
+
+// Device List
+"input_devices" = "Invoerapparaten";
+"output_devices" = "Uitvoerapparaten";
+"enable_auto_switch" = "Automatisch schakelen inschakelen";
+"reorder_devices_help" = "Herschik de lijst om de prioriteit van uw apparaten in te stellen en schakel vervolgens \"Automatisch schakelen inschakelen\" in om SoundAnchor de rest te laten doen. Het hoogste beschikbare apparaat wordt automatisch geselecteerd.";
+
+// Alert Buttons
+"alert_yes" = "Ja";
+"alert_no" = "Nee";
+
+// Login Items Alert
+"login_items_title" = "Wilt u dat SoundAnchor automatisch start bij het inloggen?";
+"login_items_message" = "Dit zorgt ervoor dat uw audioapparaten altijd correct worden beheerd.";
+
+// Settings Menu
+"settings_check_updates" = "Controleren op updates";
+"settings_add_login_items" = "Toevoegen aan opstartitems";
+"settings_remove_login_items" = "Verwijderen uit opstartitems";
+"settings_get_support" = "Ondersteuning krijgen";
+"settings_quit" = "Afsluiten"; 

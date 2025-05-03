@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "Unterstützen Sie SoundAnchor";
+"donation_message" = "Wenn Sie SoundAnchor nützlich finden, erwägen Sie bitte eine Spende zur Unterstützung der Entwicklung und Wartung.";
+"donation_cancel" = "Abbrechen";
+"donation_donate" = "Jetzt spenden";
+
+// Donation Reminder
+"reminder_title" = "Gefällt Ihnen SoundAnchor?";
+"reminder_message" = "Wenn Sie SoundAnchor nützlich finden, erwägen Sie bitte eine Spende zur Unterstützung der Entwicklung. Ihre Unterstützung hilft, die App kostenlos und ständig verbessert zu halten.";
+"reminder_later" = "Vielleicht später";
+
+// Device List
+"input_devices" = "Eingabegeräte";
+"output_devices" = "Ausgabegeräte";
+"enable_auto_switch" = "Automatische Umschaltung aktivieren";
+"reorder_devices_help" = "Ordnen Sie die Liste neu, um die Priorität Ihrer Geräte festzulegen, und aktivieren Sie dann \"Automatische Umschaltung aktivieren\", damit SoundAnchor den Rest erledigt. Das höchste verfügbare Gerät wird automatisch aktiviert.";
+
+// Alert Buttons
+"alert_yes" = "Ja";
+"alert_no" = "Nein";
+
+// Login Items Alert
+"login_items_title" = "Möchten Sie, dass SoundAnchor beim Anmelden automatisch startet?";
+"login_items_message" = "Dies stellt sicher, dass Ihre Audiogeräte immer korrekt verwaltet werden.";
+
+// Settings Menu
+"settings_check_updates" = "Nach Updates suchen";
+"settings_add_login_items" = "Zu Anmeldeelementen hinzufügen";
+"settings_remove_login_items" = "Aus Anmeldeelementen entfernen";
+"settings_get_support" = "Support erhalten";
+"settings_quit" = "Beenden"; 

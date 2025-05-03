@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "Apoie o SoundAnchor";
+"donation_message" = "Se você acha o SoundAnchor útil, considere fazer uma doação para apoiar seu desenvolvimento e manutenção.";
+"donation_cancel" = "Cancelar";
+"donation_donate" = "Doar Agora";
+
+// Donation Reminder
+"reminder_title" = "Gostando do SoundAnchor?";
+"reminder_message" = "Se você acha o SoundAnchor útil, considere apoiar seu desenvolvimento com uma doação. Seu apoio ajuda a manter o aplicativo gratuito e em constante melhoria.";
+"reminder_later" = "Talvez mais tarde";
+
+// Device List
+"input_devices" = "Dispositivos de Entrada";
+"output_devices" = "Dispositivos de Saída";
+"enable_auto_switch" = "Ativar troca automática";
+"reorder_devices_help" = "Reordene a lista para definir a prioridade dos seus dispositivos, depois ative \"Ativar troca automática\" para deixar o SoundAnchor fazer o resto. O dispositivo disponível mais alto será forçado automaticamente.";
+
+// Alert Buttons
+"alert_yes" = "Sim";
+"alert_no" = "Não";
+
+// Login Items Alert
+"login_items_title" = "Deseja que o SoundAnchor inicie automaticamente ao fazer login?";
+"login_items_message" = "Isso ajudará a garantir que seus dispositivos de áudio sejam sempre gerenciados corretamente.";
+
+// Settings Menu
+"settings_check_updates" = "Verificar atualizações";
+"settings_add_login_items" = "Adicionar aos itens de login";
+"settings_remove_login_items" = "Remover dos itens de login";
+"settings_get_support" = "Obter suporte";
+"settings_quit" = "Sair"; 

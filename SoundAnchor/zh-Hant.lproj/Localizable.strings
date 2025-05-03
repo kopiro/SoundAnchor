@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "支持 SoundAnchor";
+"donation_message" = "如果您覺得 SoundAnchor 有用，請考慮捐贈以支持其開發和維護。";
+"donation_cancel" = "取消";
+"donation_donate" = "立即捐贈";
+
+// Donation Reminder
+"reminder_title" = "喜歡 SoundAnchor 嗎？";
+"reminder_message" = "如果您覺得 SoundAnchor 有用，請考慮通過捐贈支持其開發。您的支持有助於保持應用免費並持續改進。";
+"reminder_later" = "稍後再說";
+
+// Device List
+"input_devices" = "輸入設備";
+"output_devices" = "輸出設備";
+"enable_auto_switch" = "啟用自動切換";
+"reorder_devices_help" = "重新排序列表以設置設備的優先級，然後啟用\"啟用自動切換\"，讓 SoundAnchor 完成其餘工作。最高可用的設備將自動被選中。";
+
+// Alert Buttons
+"alert_yes" = "是";
+"alert_no" = "否";
+
+// Login Items Alert
+"login_items_title" = "是否要在登入時自動啟動 SoundAnchor？";
+"login_items_message" = "這將確保您的音頻設備始終得到正確管理。";
+
+// Settings Menu
+"settings_check_updates" = "檢查更新";
+"settings_add_login_items" = "添加到登入項目";
+"settings_remove_login_items" = "從登入項目中移除";
+"settings_get_support" = "獲取支持";
+"settings_quit" = "退出"; 

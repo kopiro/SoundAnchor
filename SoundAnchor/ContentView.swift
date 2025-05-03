@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var forceOutputEnabled: Bool = AudioManager.shared.isForceOutputEnabled
     @State private var devicesReloadedAt: Date? = nil
     @State private var showingHelp = false
+    @State private var showingDonationReminder = false
 
     @EnvironmentObject var appDelegate: AppDelegate
         
@@ -19,7 +20,7 @@ struct ContentView: View {
             TopBarView(showingHelp: $showingHelp)
             List {
                 DeviceListSection(
-                    title: "Input Devices",
+                    title: "input_devices".localized,
                     devices: inputDevices,
                     isForceEnabled: $forceInputEnabled,
                     headerToggleAction: { value in
@@ -36,7 +37,7 @@ struct ContentView: View {
                     deleteAction: deleteInputDevice
                 )
                 DeviceListSection(
-                    title: "Output Devices",
+                    title: "output_devices".localized,
                     devices: outputDevices,
                     isForceEnabled: $forceOutputEnabled,
                     headerToggleAction: { value in
@@ -62,9 +63,28 @@ struct ContentView: View {
             AudioManager.shared.monitorDefaultDeviceChanges(selector: kAudioHardwarePropertyDefaultOutputDevice) { devicesReloadedAt = Date() }
             AudioManager.shared.monitorDefaultDeviceChanges(selector: kAudioHardwarePropertyDefaultInputDevice) { devicesReloadedAt = Date() }
             Analytics.logEvent("app_opened", parameters: nil)
+            
+            #if !APPSTORE
+            checkAndShowDonationReminder()
+            #endif
         }
         .frame(minWidth: 300, minHeight: 400)
         .onChange(of: devicesReloadedAt) { _ in loadDevices() }
+        .sheet(isPresented: $showingDonationReminder) {
+            DonationReminderDialog(isPresented: $showingDonationReminder)
+        }
+    }
+    
+    private func checkAndShowDonationReminder() {
+        let hasDonated = UserDefaults.standard.bool(forKey: "hasDonated")
+        if hasDonated { return }
+        
+        let lastReminder = UserDefaults.standard.object(forKey: "lastDonationReminder") as? Date ?? Date.distantPast
+        let daysSinceLastReminder = Calendar.current.dateComponents([.day], from: lastReminder, to: Date()).day ?? 0
+        
+        if daysSinceLastReminder >= 7 {
+            showingDonationReminder = true
+        }
     }
     
     private func moveInputDevices(fromOffsets indices: IndexSet, toOffset newOffset: Int) {
@@ -137,19 +157,32 @@ struct ContentView: View {
 
 struct TopBarView: View {
     @Binding var showingHelp: Bool
+    @State private var showingDonation = false
     @EnvironmentObject var appDelegate: AppDelegate
     
     var body: some View {
         HStack {
-            Text("SoundAnchor").fontWeight(.heavy)
+            Text("app_title".localized).fontWeight(.heavy)
             Spacer()
+            #if !APPSTORE
+            Button(action: { showingDonation.toggle() }) {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.red)
+                    .padding()
+            }
+            .frame(width: 24, height: 24)
+            .buttonStyle(BorderlessButtonStyle())
+            .popover(isPresented: $showingDonation) {
+                DonationDialog(isPresented: $showingDonation)
+            }
+            #endif
             Button(action: { showingHelp.toggle() }) {
                 Image(systemName: "questionmark.circle").padding()
             }
             .frame(width: 24, height: 24)
             .buttonStyle(BorderlessButtonStyle())
             .popover(isPresented: $showingHelp) {
-                Text("Reorder the list to set the priority of your devices, then enable \"Enable auto-switch\" to let SoundAnchor do the rest for you. The topmost available device will be forced automatically.")
+                Text("reorder_devices_help".localized)
                     .padding(12)
                     .frame(width: 300)
             }
@@ -201,7 +234,7 @@ struct DeviceListSection: View {
         HStack {
             Text(title)
             Spacer()
-            Toggle("Enable auto-switch", isOn: $isForceEnabled)
+            Toggle("enable_auto_switch".localized, isOn: $isForceEnabled)
                 .onChange(of: isForceEnabled, perform: headerToggleAction)
         }
     }

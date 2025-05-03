@@ -68,10 +68,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
 
     private func askToAddToLoginItems() {
         let alert = NSAlert()
-        alert.messageText = "Add to Login Items?"
-        alert.informativeText = "Would you like SoundAnchor to start automatically when you log in? This will help ensure your audio devices are always managed correctly."
-        alert.addButton(withTitle: "Yes")
-        alert.addButton(withTitle: "No")
+        alert.messageText = "login_items_title".localized
+        alert.informativeText = "login_items_message".localized
+        alert.addButton(withTitle: "alert_yes".localized)
+        alert.addButton(withTitle: "alert_no".localized)
         alert.alertStyle = .informational
         
         let response = alert.runModal()
@@ -193,15 +193,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
             }
         }
     }
-    
-    @objc public func openDonateLink() {
-        if let url = Bundle.main.object(forInfoDictionaryKey: "DonateURL") as? String,
-           let espressoURL = URL(string: url) {
-            NSWorkspace.shared.open(espressoURL)
-            Analytics.logEvent("open_donate_link", parameters: nil)
-        }
-    }
-    
     private func isAppInLoginItems() -> Bool {
         if #available(macOS 13.0, *) {
             return SMAppService.mainApp.status == .enabled
@@ -232,14 +223,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     @objc func showSettingsMenu() {
         let menu = NSMenu(title: "Settings Menu")
         #if !APPSTORE
-        menu.addItem(withTitle: "Check for Updates", action: #selector(checkForUpdates), keyEquivalent: "")
-        menu.addItem(withTitle: "Buy me an espresso", action: #selector(openDonateLink), keyEquivalent: "")
+        menu.addItem(withTitle: "settings_check_updates".localized, action: #selector(checkForUpdates), keyEquivalent: "")
         #endif
-        menu.addItem(withTitle: isAppInLoginItems() ? "Remove from Login Items" : "Add to Login Items", 
+        menu.addItem(withTitle: isAppInLoginItems() ? "settings_remove_login_items".localized : "settings_add_login_items".localized, 
                     action: #selector(toggleLoginItems), 
                     keyEquivalent: "")
-        menu.addItem(withTitle: "Get support", action: #selector(getSupport), keyEquivalent: "")
-        menu.addItem(withTitle: "Quit", action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: "settings_get_support".localized, action: #selector(getSupport), keyEquivalent: "")
+        menu.addItem(withTitle: "settings_quit".localized, action: #selector(NSApplication.shared.terminate(_:)), keyEquivalent: "")
         if let contentView = NSApplication.shared.keyWindow?.contentView {
             NSMenu.popUpContextMenu(menu, with: NSApp.currentEvent!, for: contentView)
         }
@@ -247,11 +237,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
     }
     
     @objc func getSupport() {
-        if let email = Bundle.main.object(forInfoDictionaryKey: "DeveloperEmail") as? String,
-           let mailURL = URL(string: "mailto:\(email)") {
-            NSWorkspace.shared.open(mailURL)
-            Analytics.logEvent("contact_developer", parameters: nil)
-        }
+        let supportURL = URL(string: Bundle.main.object(forInfoDictionaryKey: "SupportURL") as? String ?? "")!
+        NSWorkspace.shared.open(supportURL)
+        Analytics.logEvent("support_clicked", parameters: nil)
     }
 
 }

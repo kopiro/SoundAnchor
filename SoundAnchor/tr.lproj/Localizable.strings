@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "SoundAnchor'ı Destekleyin";
+"donation_message" = "SoundAnchor'ı faydalı buluyorsanız, geliştirme ve bakımını desteklemek için bağış yapmayı düşünebilirsiniz.";
+"donation_cancel" = "İptal";
+"donation_donate" = "Şimdi Bağış Yap";
+
+// Donation Reminder
+"reminder_title" = "SoundAnchor'ı Beğendiniz mi?";
+"reminder_message" = "SoundAnchor'ı faydalı buluyorsanız, bağış yaparak geliştirmesini desteklemeyi düşünebilirsiniz. Desteğiniz, uygulamanın ücretsiz kalmasına ve sürekli iyileştirilmesine yardımcı olur.";
+"reminder_later" = "Belki daha sonra";
+
+// Device List
+"input_devices" = "Giriş Cihazları";
+"output_devices" = "Çıkış Cihazları";
+"enable_auto_switch" = "Otomatik geçişi etkinleştir";
+"reorder_devices_help" = "Cihazlarınızın önceliğini belirlemek için listeyi yeniden sıralayın, ardından SoundAnchor'ın gerisini yapması için \"Otomatik geçişi etkinleştir\"i açın. En yüksek kullanılabilir cihaz otomatik olarak seçilecektir.";
+
+// Alert Buttons
+"alert_yes" = "Evet";
+"alert_no" = "Hayır";
+
+// Login Items Alert
+"login_items_title" = "SoundAnchor'ın oturum açtığınızda otomatik olarak başlamasını ister misiniz?";
+"login_items_message" = "Bu, ses cihazlarınızın her zaman doğru şekilde yönetilmesini sağlar.";
+
+// Settings Menu
+"settings_check_updates" = "Güncellemeleri kontrol et";
+"settings_add_login_items" = "Oturum açma öğelerine ekle";
+"settings_remove_login_items" = "Oturum açma öğelerinden kaldır";
+"settings_get_support" = "Destek al";
+"settings_quit" = "Çıkış"; 

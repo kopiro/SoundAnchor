@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "Support SoundAnchor";
+"donation_message" = "If you find SoundAnchor useful, please consider making a donation to support its development and maintenance.";
+"donation_cancel" = "Cancel";
+"donation_donate" = "Donate Now";
+
+// Donation Reminder
+"reminder_title" = "Enjoying SoundAnchor?";
+"reminder_message" = "If you find SoundAnchor useful, please consider supporting its development with a donation. Your support helps keep the app free and continuously improved.";
+"reminder_later" = "Maybe Later";
+
+// Device List
+"input_devices" = "Input Devices";
+"output_devices" = "Output Devices";
+"enable_auto_switch" = "Enable auto-switch";
+"reorder_devices_help" = "Reorder the list to set the priority of your devices, then enable \"Enable auto-switch\" to let SoundAnchor do the rest for you. The topmost available device will be forced automatically.";
+
+// Alert Buttons
+"alert_yes" = "Yes";
+"alert_no" = "No";
+
+// Login Items Alert
+"login_items_title" = "Would you like SoundAnchor to start automatically when you log in?";
+"login_items_message" = "This will help ensure your audio devices are always managed correctly.";
+
+// Settings Menu
+"settings_check_updates" = "Check for Updates";
+"settings_add_login_items" = "Add to Login Items";
+"settings_remove_login_items" = "Remove from Login Items";
+"settings_get_support" = "Get support";
+"settings_quit" = "Quit"; 

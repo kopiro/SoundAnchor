@@ -1,0 +1,34 @@
+// App Title
+"app_title" = "SoundAnchor";
+
+// Donation Dialog
+"donation_title" = "Soutenez SoundAnchor";
+"donation_message" = "Si vous trouvez SoundAnchor utile, envisagez de faire un don pour soutenir son développement et sa maintenance.";
+"donation_cancel" = "Annuler";
+"donation_donate" = "Faire un don";
+
+// Donation Reminder
+"reminder_title" = "Vous appréciez SoundAnchor ?";
+"reminder_message" = "Si vous trouvez SoundAnchor utile, envisagez de soutenir son développement par un don. Votre soutien aide à maintenir l'application gratuite et en constante amélioration.";
+"reminder_later" = "Peut-être plus tard";
+
+// Device List
+"input_devices" = "Périphériques d'Entrée";
+"output_devices" = "Périphériques de Sortie";
+"enable_auto_switch" = "Activer le changement automatique";
+"reorder_devices_help" = "Réorganisez la liste pour définir la priorité de vos périphériques, puis activez \"Activer le changement automatique\" pour laisser SoundAnchor faire le reste. Le périphérique disponible le plus haut sera forcé automatiquement.";
+
+// Alert Buttons
+"alert_yes" = "Oui";
+"alert_no" = "Non";
+
+// Login Items Alert
+"login_items_title" = "Voulez-vous que SoundAnchor démarre automatiquement à la connexion ?";
+"login_items_message" = "Cela permettra de s'assurer que vos périphériques audio sont toujours gérés correctement.";
+
+// Settings Menu
+"settings_check_updates" = "Vérifier les mises à jour";
+"settings_add_login_items" = "Ajouter aux éléments de connexion";
+"settings_remove_login_items" = "Supprimer des éléments de connexion";
+"settings_get_support" = "Obtenir de l'aide";
+"settings_quit" = "Quitter"; 

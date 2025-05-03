@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>DeveloperEmail</key>
-	<string>destefano.flavio+soundanchor@gmail.com</string>
 	<key>DonateURL</key>
 	<string>https://buymeacoffee.com/kopiro</string>
 	<key>NSApplicationCrashOnExceptions</key>
@@ -12,5 +10,7 @@
 	<true/>
 	<key>SUFeedURL</key>
 	<string>https://apps.kopiro.me/soundanchor/appcast.xml</string>
+	<key>SupportURL</key>
+	<string>https://apps.kopiro.me/soundanchor#support</string>
 </dict>
 </plist>
