@@ -76,10 +76,10 @@ struct ContentView: View {
     }
     
     private func checkAndShowDonationReminder() {
-        let hasDonated = UserDefaults.standard.bool(forKey: "hasDonated")
+        let hasDonated = UserDefaults.standard.bool(forKey: "HasDonated")
         if hasDonated { return }
         
-        let lastReminder = UserDefaults.standard.object(forKey: "lastDonationReminder") as? Date ?? Date.distantPast
+        let lastReminder = UserDefaults.standard.object(forKey: "LastDonationReminder") as? Date ?? Date.distantPast
         let daysSinceLastReminder = Calendar.current.dateComponents([.day], from: lastReminder, to: Date()).day ?? 0
         
         if daysSinceLastReminder >= 7 {

@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAnalytics
 
 struct DonationReminderDialog: View {
     @Binding var isPresented: Bool
@@ -16,12 +17,19 @@ struct DonationReminderDialog: View {
             
             HStack(spacing: 20) {
                 Button("reminder_later".localized) {
-                    UserDefaults.standard.set(Date(), forKey: "lastDonationReminder")
+                    UserDefaults.standard.set(Date(), forKey: "LastDonationReminder")
                     isPresented = false
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
                 
-                Link("donation_donate".localized, destination: donationURL)
+                Button("donation_donate".localized) {
+                    UserDefaults.standard.set(true, forKey: "hasDonated")
+                    Analytics.logEvent("donation_clicked", parameters: ["source": "reminder"])
+                    isPresented = false
+                    NSWorkspace.shared.open(donationURL)
+                }
+                .buttonStyle(.bordered)
+                .accentColor(.accentColor)
             }
         }
         .padding()

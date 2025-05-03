@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAnalytics
 
 struct DonationDialog: View {
     @Binding var isPresented: Bool
@@ -13,18 +14,15 @@ struct DonationDialog: View {
             Text("donation_message".localized)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            
-            HStack(spacing: 20) {
-                Button("donation_cancel".localized) {
+        
+                
+            Link("donation_donate".localized, destination: donationURL)
+                .onTapGesture {
+                    UserDefaults.standard.set(true, forKey: "HasDonated")
+                    Analytics.logEvent("donation_clicked", parameters: nil)
                     isPresented = false
                 }
-                .buttonStyle(.bordered)
-                
-                Link("donation_donate".localized, destination: donationURL)
-                    .onTapGesture {
-                        UserDefaults.standard.set(true, forKey: "hasDonated")
-                    }
-            }
+            
         }
         .padding()
         .frame(width: 300)
