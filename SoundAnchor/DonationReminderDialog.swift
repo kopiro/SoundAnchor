@@ -23,7 +23,7 @@ struct DonationReminderDialog: View {
                 .buttonStyle(.plain)
                 
                 Button("donation_donate".localized) {
-                    UserDefaults.standard.set(true, forKey: "hasDonated")
+                    UserDefaults.standard.set(true, forKey: "HasDonated")
                     Analytics.logEvent("donation_clicked", parameters: ["source": "reminder"])
                     isPresented = false
                     NSWorkspace.shared.open(donationURL)
