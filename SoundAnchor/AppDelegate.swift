@@ -27,6 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         
         UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
         
+        // Set initial donation reminder date on first launch
+        if isFirstLaunch {
+            UserDefaults.standard.set(Date(), forKey: "LastDonationReminder")
+        }
+        
         // Configure Firebase
         let options = FirebaseOptions(contentsOfFile: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!)!
         FirebaseApp.configure(options: options)
