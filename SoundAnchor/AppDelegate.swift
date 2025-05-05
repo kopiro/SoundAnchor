@@ -27,8 +27,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         
         UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
         
-        FirebaseApp.configure()
-
+        // Configure Firebase with proper settings for menubar app
+        let options = FirebaseOptions(contentsOfFile: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!)!
+        options.isAnalyticsCollectionEnabled = true
+        options.isAnalyticsCollectionDeactivated = false
+        FirebaseApp.configure(options: options)
+        
+        // Set analytics collection interval to ensure real-time reporting
+        Analytics.setAnalyticsCollectionEnabled(true)
+        Analytics.setSessionTimeoutInterval(1800) // 30 minutes
+        
+        // Start periodic analytics sync
+        startAnalyticsSyncTimer()
+        
         NSApp.setActivationPolicy(.accessory)
         
         // Create window
@@ -240,6 +251,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         let supportURL = URL(string: Bundle.main.object(forInfoDictionaryKey: "SupportURL") as? String ?? "")!
         NSWorkspace.shared.open(supportURL)
         Analytics.logEvent("support_clicked", parameters: nil)
+    }
+
+    private func startAnalyticsSyncTimer() {
+        // Sync analytics every 5 minutes
+        Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
+            Analytics.logEvent("analytics_sync", parameters: nil)
+        }
     }
 
 }
