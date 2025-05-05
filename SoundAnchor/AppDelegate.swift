@@ -27,13 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SPUStand
         
         UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
         
-        // Configure Firebase with proper settings for menubar app
+        // Configure Firebase
         let options = FirebaseOptions(contentsOfFile: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!)!
-        options.isAnalyticsCollectionEnabled = true
-        options.isAnalyticsCollectionDeactivated = false
         FirebaseApp.configure(options: options)
         
-        // Set analytics collection interval to ensure real-time reporting
+        // Configure analytics for menubar app
         Analytics.setAnalyticsCollectionEnabled(true)
         Analytics.setSessionTimeoutInterval(1800) // 30 minutes
         
